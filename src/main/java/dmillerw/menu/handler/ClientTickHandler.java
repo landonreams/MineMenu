@@ -22,6 +22,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -33,8 +34,9 @@ public class ClientTickHandler {
 
     private static final int ITEM_RENDER_ANGLE_OFFSET = -2;
 
-    private static final double OUTER_RADIUS = 80;
-    private static final double INNER_RADIUS = 60;
+    // Changed to public to allow for deadzone calculation
+    public static final double OUTER_RADIUS = 80;
+    public static final double INNER_RADIUS = 60;
 
     public static void register() {
         MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
@@ -114,13 +116,15 @@ public class ClientTickHandler {
             currAngle = AngleHelper.correctAngle(currAngle);
             nextAngle = AngleHelper.correctAngle(nextAngle);
 
-            boolean mouseIn = mouseAngle > currAngle && mouseAngle < nextAngle;
+            boolean mouseIn = mouseAngle > currAngle && mouseAngle < nextAngle && checkMouseDeadzone(Mouse.getX(), Mouse.getY(), resolution);
 
             currAngle = Math.toRadians(currAngle);
             nextAngle = Math.toRadians(nextAngle);
 
             double innerRadius = ((INNER_RADIUS - RadialMenu.animationTimer - (mouseIn ? 2 : 0)) / 100F) * (257F / (float) resolution.getScaledHeight());
             double outerRadius = ((OUTER_RADIUS - RadialMenu.animationTimer + (mouseIn ? 2 : 0)) / 100F) * (257F / (float) resolution.getScaledHeight());
+
+            double innerRadiusHeight = innerRadius * resolution.getScaledHeight_double() / resolution.getScaledWidth_double();
 
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
 
@@ -189,6 +193,16 @@ public class ClientTickHandler {
         GlStateManager.popMatrix();
     }
 
+    public static boolean checkMouseDeadzone(int x, int y, CompatibleScaledResolution resolution) {
+        if(!ConfigHandler.releaseToSelect) return true;
+        if(resolution == null)
+            resolution = new CompatibleScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+        // 1.285 = Inner Radius / 100 * 257(???) / scaled height * default height / 2
+        double deadzoneRadius = 1.285F * (ClientTickHandler.INNER_RADIUS - 2)  / resolution.getScaledHeight_double() * Minecraft.getMinecraft().displayHeight * ConfigHandler.releaseDeadzonePercent;
+        double mouseVector = Math.sqrt(Math.pow(x - (Minecraft.getMinecraft().displayWidth / 2), 2) + Math.pow(y - (Minecraft.getMinecraft().displayHeight / 2), 2));
+        return mouseVector > deadzoneRadius;
+    }
+
     private void renderText(ScaledResolution resolution) {
         Minecraft mc = Minecraft.getMinecraft();
         FontRenderer fontRenderer = mc.fontRendererObj;
@@ -203,7 +217,7 @@ public class ClientTickHandler {
             currAngle = AngleHelper.correctAngle(currAngle);
             nextAngle = AngleHelper.correctAngle(nextAngle);
 
-            boolean mouseIn = mouseAngle > currAngle && mouseAngle < nextAngle;
+            boolean mouseIn = mouseAngle > currAngle && mouseAngle < nextAngle && checkMouseDeadzone(Mouse.getX(), Mouse.getY(), null);
 
             if (mouseIn) {
                 MenuItem item = RadialMenu.getActiveArray()[i];

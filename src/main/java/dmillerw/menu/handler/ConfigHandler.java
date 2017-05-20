@@ -24,6 +24,7 @@ public class ConfigHandler {
     public static boolean rightClickToEdit;
     public static boolean releaseToSelect;
     public static boolean removeStoneOnMenuButton;
+    public static double releaseDeadzonePercent;
 
     public static void init(File configFile) {
         if (config == null) {
@@ -58,7 +59,7 @@ public class ConfigHandler {
         rightClickToEdit = config.get(Configuration.CATEGORY_GENERAL, "rightClickToEdit", false).getBoolean();
         releaseToSelect = config.get(Configuration.CATEGORY_GENERAL, "releaseToSelect", false).getBoolean();
         removeStoneOnMenuButton = config.get(Configuration.CATEGORY_GENERAL, "removeStoneOnMenuButton", false).getBoolean();
-
+        releaseDeadzonePercent = 0.01 * (double)config.getInt("releaseDeadzonePercent", Configuration.CATEGORY_GENERAL, 0, 0, 100, "Percentage of the circle that is a deadzone with release to click on.");
         if (config.hasChanged()) {
             config.save();
         }
