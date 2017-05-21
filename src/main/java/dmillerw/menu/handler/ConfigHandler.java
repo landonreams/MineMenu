@@ -12,6 +12,7 @@ public class ConfigHandler {
     public static Configuration config;
     public static final String CATEGORY_SERVER = "server";
     public static final String CATEGORY_VISUAL = "visual";
+    public static final String CATEGORY_VIVECRAFT = "general.vivecraft";
     public static int menuAlpha;
     public static int menuRed;
     public static int menuGreen;
@@ -54,6 +55,8 @@ public class ConfigHandler {
         selectRed = verify(p_selectRed);
         selectGreen = verify(p_selectGreen);
         selectBlue = verify(p_selectBlue);
+
+        config.get(CATEGORY_VIVECRAFT,"test",false,"Test boolean");
 
         toggle = config.get(Configuration.CATEGORY_GENERAL, "toggle", false).getBoolean();
         rightClickToEdit = config.get(Configuration.CATEGORY_GENERAL, "rightClickToEdit", false).getBoolean();

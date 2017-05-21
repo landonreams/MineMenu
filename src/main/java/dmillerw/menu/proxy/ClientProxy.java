@@ -4,7 +4,10 @@ import dmillerw.menu.MineMenu;
 import dmillerw.menu.data.json.MenuLoader;
 import dmillerw.menu.handler.ClientTickHandler;
 import dmillerw.menu.handler.KeyboardHandler;
+import dmillerw.menu.handler.LogHandler;
 import dmillerw.menu.helper.KeyReflectionHelper;
+import dmillerw.menu.vive.VivecraftKeyboardHandler;
+import dmillerw.menu.vive.VivecraftReflector;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -19,8 +22,12 @@ public class ClientProxy extends CommonProxy {
 
         KeyReflectionHelper.gatherFields();
 
-        KeyboardHandler.register();
-        ClientTickHandler.register();
+        if(VivecraftReflector.isInstalled()) {
+            VivecraftKeyboardHandler.register();
+        } else {
+            KeyboardHandler.register();
+            ClientTickHandler.register();
+        }
     }
 
     @Override
@@ -31,5 +38,10 @@ public class ClientProxy extends CommonProxy {
             MenuLoader.save(MineMenu.menuFile);
         }
         MenuLoader.load(MineMenu.menuFile);
+        if(VivecraftReflector.isInstalled()) {
+            LogHandler.info("Vivecraft detected!");
+        } else {
+            LogHandler.info("Vivecraft not detected.");
+        }
     }
 }
