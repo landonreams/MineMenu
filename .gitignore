@@ -1,18 +1,26 @@
-# push src/ only
-*
-!src/
-!gradle/
-!gradlew
-!gradlew.bat
-!README.md
-!LICENSE
-!build.gradle
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
 
-*.class
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# gradle
+build
+.gradle
+/gradle
 
-# Package Files #
-*.war
-*.ear
+# other
+eclipse
+run
+libs
+gradlew
+*.bat
