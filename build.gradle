@@ -46,3 +46,7 @@ processResources{
 jar {
     classifier = 'universal'
 }
+
+dependencies {
+    compile "org.projectlombok:lombok:1.16.16"
+}
